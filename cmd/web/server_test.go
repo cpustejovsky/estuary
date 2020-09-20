@@ -25,7 +25,7 @@ func TestGetHome(t *testing.T) {
 
 func TestNoteRoutesExist(t *testing.T) {
 	app := newTestApplication(t)
-	ts := newTestServer(t, app.routes)
+	ts := newTestServer(t, app.routes())
 	tests := []struct {
 		name     string
 		urlPath  string

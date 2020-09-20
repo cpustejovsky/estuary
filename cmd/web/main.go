@@ -24,8 +24,6 @@ func main() {
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.LUTC|log.Llongfile)
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.LUTC)
 
-	handler := http.HandlerFunc(Server)
-
 	app := &application{
 		errorLog: errorLog,
 		infoLog:  infoLog,
@@ -33,7 +31,7 @@ func main() {
 
 	srv := &http.Server{
 		Addr:    cfg.Addr,
-		Handler: handler,
+		Handler: app.routes(),
 	}
 
 	infoLog.Printf("Starting server on %s", cfg.Addr)
