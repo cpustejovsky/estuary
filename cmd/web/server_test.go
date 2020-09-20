@@ -3,25 +3,8 @@ package main
 import (
 	"bytes"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 )
-
-func TestGetHome(t *testing.T) {
-	t.Run("returns 'Hello, World' for '/' route", func(t *testing.T) {
-		request, _ := http.NewRequest(http.MethodGet, "/", nil)
-		response := httptest.NewRecorder()
-
-		Server(response, request)
-
-		got := response.Body.String()
-		want := "Hello, World"
-
-		if got != want {
-			t.Errorf("got %q, want %q", got, want)
-		}
-	})
-}
 
 func TestNoteRoutesExist(t *testing.T) {
 	app := newTestApplication(t)
@@ -33,8 +16,9 @@ func TestNoteRoutesExist(t *testing.T) {
 		wantCode int
 		wantBody []byte
 	}{
-		{"Valid ID", "/api/notes/category", "get", http.StatusOK, nil},
-		{"Non-existent ID", "/api/notes", "post", http.StatusOK, nil},
+		{"Home", "/", "get", http.StatusOK, nil},
+		{"Getting Notes", "/api/notes/", "get", http.StatusOK, nil},
+		{"Posting to Notes", "/api/notes", "post", http.StatusOK, nil},
 	}
 
 	for _, tt := range tests {

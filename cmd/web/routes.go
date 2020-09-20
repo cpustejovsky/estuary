@@ -9,7 +9,7 @@ import (
 func (app *application) routes() http.Handler {
 	mux := pat.New()
 
-	mux.Get("/", http.HandlerFunc(Server))
+	mux.Get("/", http.HandlerFunc(app.home))
 
 	return mux
 }
