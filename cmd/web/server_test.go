@@ -17,7 +17,7 @@ func TestNoteRoutesExist(t *testing.T) {
 		wantBody []byte
 	}{
 		{"Home", "/", "get", http.StatusOK, []byte("Hello, World")},
-		{"Getting Notes", "/api/notes", "get", http.StatusOK, nil},
+		{"Getting Notes", "/api/notes/123", "get", http.StatusOK, []byte("123")},
 		{"Posting to Notes", "/api/notes", "post", http.StatusOK, nil},
 	}
 
