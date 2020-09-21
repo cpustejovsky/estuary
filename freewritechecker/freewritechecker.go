@@ -4,9 +4,9 @@ import (
 	"regexp"
 )
 
-func WordCount(file []byte) (int, error) {
+func WordCount(file []byte) int {
 	text := string(file)
-
+	//TODO: determine if error checking is needed
 	total := regexp.MustCompile(`\w+`)
 	matches := total.FindAllStringIndex(text, -1)
 
@@ -14,5 +14,5 @@ func WordCount(file []byte) (int, error) {
 	noteMatches := notes.FindAllStringIndex(text, -1)
 
 	wordCount := len(matches) - len(noteMatches)
-	return wordCount, nil
+	return wordCount
 }

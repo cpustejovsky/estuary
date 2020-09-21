@@ -11,9 +11,11 @@ func TestFreeWriteChecker(t *testing.T) {
 		t.Error(err)
 	}
 
-	got, err := WordCount(file)
-	want := 48
-	if got != want {
-		t.Errorf("want %d; got %d", want, got)
-	}
+	t.Run("Returns Correct Count", func(t *testing.T) {
+		got := WordCount(file)
+		want := 48
+		if got != want {
+			t.Errorf("want %d; got %d", want, got)
+		}
+	})
 }
