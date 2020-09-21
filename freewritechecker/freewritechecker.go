@@ -23,3 +23,16 @@ func NoteRemover(file []byte) string {
 	newtext := notes.ReplaceAllString(text, "")
 	return newtext
 }
+
+func NoteChecker(file []byte) []string {
+	text := string(file)
+	re := regexp.MustCompile(`[#][n].*|[#][N].*`)
+	symb := regexp.MustCompile(`[#][n].|[#][N].`)
+	t := re.FindAllString(text, -1)
+	var notes []string
+	for _, s := range t {
+		modified := symb.ReplaceAllString(s, "")
+		notes = append(notes, modified)
+	}
+	return notes
+}
