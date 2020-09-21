@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-func (app *application) home(w http.ResponseWriter, r *http.Request) {
+func (app *application) placeholder(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Hello, World")
 }
 
