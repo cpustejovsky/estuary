@@ -16,3 +16,7 @@ func WordCount(file []byte) int {
 	wordCount := len(matches) - len(noteMatches)
 	return wordCount
 }
+
+func NoteRemover(file []byte) string {
+	return string(file)
+}
