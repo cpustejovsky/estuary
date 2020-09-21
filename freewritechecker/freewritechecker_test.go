@@ -2,6 +2,7 @@ package freewritechecker
 
 import (
 	"io/ioutil"
+	"reflect"
 	"testing"
 )
 
@@ -27,6 +28,14 @@ func TestFreeWriteChecker(t *testing.T) {
 		got := NoteRemover(file)
 		want := string(notesRemoved)
 		if got != want {
+			t.Errorf("\nwant:\n%v\ngot:\n%v", want, got)
+		}
+	})
+
+	t.Run("Returns an array of notes", func(t *testing.T) {
+		got := NoteChecker(file)
+		want := []string{"this is a note", "this is a note"}
+		if !reflect.DeepEqual(got, want) {
 			t.Errorf("\nwant:\n%v\ngot:\n%v", want, got)
 		}
 	})
