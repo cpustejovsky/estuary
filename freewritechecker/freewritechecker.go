@@ -10,13 +10,16 @@ func WordCount(file []byte) int {
 	total := regexp.MustCompile(`\w+`)
 	matches := total.FindAllStringIndex(text, -1)
 
-	notes := regexp.MustCompile(`[#][n]|[#][N]`)
-	noteMatches := notes.FindAllStringIndex(text, -1)
+	noteSymbol := regexp.MustCompile(`[#][n]|[#][N]`)
+	symbolMatches := noteSymbol.FindAllStringIndex(text, -1)
 
-	wordCount := len(matches) - len(noteMatches)
+	wordCount := len(matches) - len(symbolMatches)
 	return wordCount
 }
 
 func NoteRemover(file []byte) string {
-	return string(file)
+	text := string(file)
+	notes := regexp.MustCompile(`\s[#][n].*|\s[#][N].*`)
+	newtext := notes.ReplaceAllString(text, "")
+	return newtext
 }
