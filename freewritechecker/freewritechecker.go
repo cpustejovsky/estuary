@@ -5,8 +5,14 @@ import (
 )
 
 func WordCount(file []byte) (int, error) {
-	re := regexp.MustCompile(`\s`)
 	text := string(file)
-	split := re.Split(text, -1)
-	return len(split), nil
+
+	total := regexp.MustCompile(`\w+`)
+	matches := total.FindAllStringIndex(text, -1)
+
+	notes := regexp.MustCompile(`[#][n]|[#][N]`)
+	noteMatches := notes.FindAllStringIndex(text, -1)
+
+	wordCount := len(matches) - len(noteMatches)
+	return wordCount, nil
 }

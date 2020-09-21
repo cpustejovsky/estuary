@@ -12,7 +12,7 @@ func TestFreeWriteChecker(t *testing.T) {
 	}
 
 	got, err := WordCount(file)
-	want := 54
+	want := 48
 	if got != want {
 		t.Errorf("want %d; got %d", want, got)
 	}
