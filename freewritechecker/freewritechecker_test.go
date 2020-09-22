@@ -25,7 +25,7 @@ func TestFreeWriteChecker(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		got := NoteRemover(file)
+		got, _ := NoteChecker(file)
 		want := string(notesRemoved)
 		if got != want {
 			t.Errorf("\nwant:\n%v\ngot:\n%v", want, got)
@@ -33,7 +33,7 @@ func TestFreeWriteChecker(t *testing.T) {
 	})
 
 	t.Run("Returns an array of notes", func(t *testing.T) {
-		got := NoteChecker(file)
+		_, got := NoteChecker(file)
 		want := []string{"this is a note", "this is a note"}
 		if !reflect.DeepEqual(got, want) {
 			t.Errorf("\nwant:\n%v\ngot:\n%v", want, got)

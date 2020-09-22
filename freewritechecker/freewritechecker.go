@@ -16,24 +16,18 @@ func WordCount(file []byte) int {
 	return len(total) - len(symbols)
 }
 
-func NoteRemover(file []byte) string {
-	text := string(file)
-	re := regexp.MustCompile(`\s[#][nN].*`)
-	return re.ReplaceAllString(text, "")
-}
-
-func NoteChecker(file []byte) []string {
-	text := string(file)
+func NoteChecker(file []byte) (string, []string) {
+	t := string(file)
 	var notes []string
+	re := regexp.MustCompile(`\s[#][nN].*`)
+	text := re.ReplaceAllString(t, "")
+	n := re.FindAllString(t, -1)
 
-	re := regexp.MustCompile(`[#][nN].*`)
-	t := re.FindAllString(text, -1)
-
-	symb := regexp.MustCompile(`[#][nN].`)
-	for _, s := range t {
+	symb := regexp.MustCompile(`\s[#][nN].`)
+	for _, s := range n {
 		modified := symb.ReplaceAllString(s, "")
 		notes = append(notes, modified)
 	}
 
-	return notes
+	return text, notes
 }
