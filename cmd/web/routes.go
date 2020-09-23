@@ -17,7 +17,7 @@ func (app *application) routes() http.Handler {
 	mux.Get("/auth/google/callback", http.HandlerFunc(app.placeholder))
 
 	//User Routes
-	mux.Get("/api/user", http.HandlerFunc(app.placeholder))
+	mux.Get("/api/user", http.HandlerFunc(app.getUser))
 	mux.Patch("/api/user", http.HandlerFunc(app.placeholder))
 	mux.Del("/api/user", http.HandlerFunc(app.placeholder))
 
