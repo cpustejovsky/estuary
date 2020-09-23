@@ -12,8 +12,14 @@ func TestFreeWriteChecker(t *testing.T) {
 		t.Error(err)
 	}
 
+	notesRemoved, err := ioutil.ReadFile("notesRemoved.txt")
+	if err != nil {
+		t.Error(err)
+	}
+	text := string(file)
+	
 	t.Run("Returns Correct Word Count", func(t *testing.T) {
-		got := WordCount(file)
+		got := WordCount(text)
 		want := 48
 		if got != want {
 			t.Errorf("want %d; got %d", want, got)
@@ -21,11 +27,7 @@ func TestFreeWriteChecker(t *testing.T) {
 	})
 
 	t.Run("Returns string of text with notes removed", func(t *testing.T) {
-		notesRemoved, err := ioutil.ReadFile("notesRemoved.txt")
-		if err != nil {
-			t.Error(err)
-		}
-		got, _ := NoteChecker(file)
+		got, _ := NoteChecker(text)
 		want := string(notesRemoved)
 		if got != want {
 			t.Errorf("\nwant:\n%v\ngot:\n%v", want, got)
@@ -33,7 +35,7 @@ func TestFreeWriteChecker(t *testing.T) {
 	})
 
 	t.Run("Returns an array of notes", func(t *testing.T) {
-		_, got := NoteChecker(file)
+		_, got := NoteChecker(text)
 		want := []string{"this is a note", "this is a note"}
 		if !reflect.DeepEqual(got, want) {
 			t.Errorf("\nwant:\n%v\ngot:\n%v", want, got)

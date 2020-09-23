@@ -4,8 +4,7 @@ import (
 	"regexp"
 )
 
-func WordCount(file []byte) int {
-	text := string(file)
+func WordCount(text string) int {
 	//TODO: determine if error checking is needed
 	t := regexp.MustCompile(`\w+`)
 	total := t.FindAllStringIndex(text, -1)
@@ -16,18 +15,17 @@ func WordCount(file []byte) int {
 	return len(total) - len(symbols)
 }
 
-func NoteChecker(file []byte) (string, []string) {
-	t := string(file)
+func NoteChecker(text string) (string, []string) {
 	var notes []string
 	re := regexp.MustCompile(`\s[#][nN].*`)
-	text := re.ReplaceAllString(t, "")
-	n := re.FindAllString(t, -1)
+	modified := re.ReplaceAllString(text, "")
+	n := re.FindAllString(text, -1)
 
 	symb := regexp.MustCompile(`\s[#][nN].`)
 	for _, s := range n {
-		modified := symb.ReplaceAllString(s, "")
-		notes = append(notes, modified)
+		m := symb.ReplaceAllString(s, "")
+		notes = append(notes, m)
 	}
 
-	return text, notes
+	return modified, notes
 }
