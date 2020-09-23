@@ -11,6 +11,19 @@ func (app *application) routes() http.Handler {
 
 	mux.Get("/", http.HandlerFunc(app.placeholder))
 
+	//Auth Routes
+
+	mux.Post("/signup", http.HandlerFunc(app.placeholder))
+	mux.Post("/login", http.HandlerFunc(app.placeholder))
+	mux.Get("/logout", http.HandlerFunc(app.placeholder))
+	mux.Get("/auth/google", http.HandlerFunc(app.placeholder))
+	mux.Get("/auth/google/callback", http.HandlerFunc(app.placeholder))
+
+	//User Routes
+	mux.Get("/api/user", http.HandlerFunc(app.placeholder))
+	mux.Patch("/api/user", http.HandlerFunc(app.placeholder))
+	mux.Del("/api/user", http.HandlerFunc(app.placeholder))
+
 	//Notes Routes
 	mux.Get("/api/notes/category/:name", http.HandlerFunc(app.getNote))
 	mux.Get("/api/notes/:id", http.HandlerFunc(app.getNote))
