@@ -9,13 +9,10 @@ import (
 func (app *application) routes() http.Handler {
 	mux := pat.New()
 
-	mux.Get("/", http.HandlerFunc(app.placeholder))
-
 	//Auth Routes
-
-	mux.Post("/signup", http.HandlerFunc(app.placeholder))
-	mux.Post("/login", http.HandlerFunc(app.placeholder))
-	mux.Get("/logout", http.HandlerFunc(app.placeholder))
+	mux.Post("/api/signup", http.HandlerFunc(app.signup))
+	mux.Post("/api/login", http.HandlerFunc(app.placeholder))
+	mux.Get("/api/logout", http.HandlerFunc(app.placeholder))
 	mux.Get("/auth/google", http.HandlerFunc(app.placeholder))
 	mux.Get("/auth/google/callback", http.HandlerFunc(app.placeholder))
 

@@ -18,3 +18,7 @@ func (app *application) getNote(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Fprint(w, id)
 }
+
+func (app *application) signup(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("hit the signup route")
+}
