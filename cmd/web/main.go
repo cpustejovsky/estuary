@@ -19,13 +19,12 @@ func init() {
 }
 
 const (
-	host   = "localhost"
-	port   = 5432
-	user   = "postgres"
-	dbname = "estuarydev"
+	host     = "localhost"
+	port     = 5432
+	user     = "postgres"
+	password = "password"
+	dbname   = "estuarydev"
 )
-
-var password string = os.Getenv("TEST_PSQL_PW")
 
 type Config struct {
 	Addr string
@@ -50,7 +49,6 @@ func main() {
 		panic(err)
 	}
 	defer db.Close()
-
 	err = db.Ping()
 	if err != nil {
 		panic(err)
