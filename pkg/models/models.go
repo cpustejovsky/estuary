@@ -11,13 +11,21 @@ var (
 	ErrDuplicateEmail     = errors.New("models: duplicate email")
 )
 
+type User struct {
+	//UUID
+	ID             int
+	Name           string
+	Email          string
+	HashedPassword []byte
+}
+
 type Note struct {
-	Content  string
-	Category string
-	Tags     []string
-	DueDate  time.Time
-	RemindDate time.Time
-	Completed bool
+	Content       string
+	Category      string
+	Tags          []string
+	DueDate       time.Time
+	RemindDate    time.Time
+	Completed     bool
 	CompletedDate time.Time
 	//how to connect to user and project
 	//how to add a dependent on schema
