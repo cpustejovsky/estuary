@@ -16,12 +16,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func init() {
-	if err := godotenv.Load(); err != nil {
-		log.Print("No .env file found")
-	}
-}
-
 const (
 	host   = "localhost"
 	port   = 5432
@@ -48,15 +42,27 @@ type application struct {
 	}
 }
 
+func init() {
+	if err := godotenv.Load(); err != nil {
+		log.Print("No .env file found")
+	}
+}
+
 func main() {
-	var password = os.Getenv("TEST_PSQL_PW")
+	// Flag and Config Setup
 	cfg := new(Config)
 	flag.StringVar(&cfg.Addr, "addr", ":5000", "HTTP network address")
 	flag.Parse()
 
+	// Environemntal Variables
+	var password = os.Getenv("TEST_PSQL_PW")
+	var sessionSecret = []byte(os.Getenv("SESSION_SECRET"))
+
+	// Logging
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.LUTC|log.Llongfile)
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.LUTC)
 
+	// DB Setup
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
@@ -72,9 +78,11 @@ func main() {
 	}
 	infoLog.Println("Successfully connected to database!")
 
-	session := sessions.New([]byte(os.Getenv("SESSION_SECRET")))
+	// Session Setup
+	session := sessions.New(sessionSecret)
 	session.Lifetime = 12 * time.Hour
 
+	// Application and Server Initialization
 	app := &application{
 		errorLog: errorLog,
 		infoLog:  infoLog,
@@ -86,8 +94,9 @@ func main() {
 		Addr:    cfg.Addr,
 		Handler: app.routes(),
 	}
-
 	infoLog.Printf("Starting server on %s", cfg.Addr)
+
+	// Server Start
 	err = srv.ListenAndServe()
 	errorLog.Fatal(err)
 }
