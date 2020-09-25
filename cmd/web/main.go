@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/cpustejovsky/estuary/pkg/models/"
+	"github.com/cpustejovsky/estuary/pkg/models/psql"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
@@ -33,6 +35,11 @@ type Config struct {
 type application struct {
 	errorLog *log.Logger
 	infoLog  *log.Logger
+	users    interface {
+		Insert(string, string, string) error
+		Authenticate(string, string) (int, error)
+		Get(int) (*models.User, error)
+	}
 }
 
 func main() {
@@ -62,6 +69,7 @@ func main() {
 	app := &application{
 		errorLog: errorLog,
 		infoLog:  infoLog,
+		users:    &psql.UserModel{DB: db},
 	}
 
 	srv := &http.Server{

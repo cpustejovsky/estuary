@@ -42,4 +42,5 @@ func (app *application) signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println(user)
+	app.users.Insert
 }
