@@ -17,6 +17,11 @@ type User struct {
 	Name           string
 	Email          string
 	HashedPassword []byte
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	DeletedAt      *time.Time
+	EmailUpdates   bool
+	AdvancedView   bool
 }
 
 type Note struct {
