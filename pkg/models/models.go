@@ -3,6 +3,8 @@ package models
 import (
 	"errors"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 var (
@@ -12,8 +14,7 @@ var (
 )
 
 type User struct {
-	//UUID
-	ID             int
+	ID             uuid.UUID `gorm:"primary_key; unique; type:uuid; column:id; default:uuid_generate_v4()"`
 	Name           string
 	Email          string
 	HashedPassword []byte
