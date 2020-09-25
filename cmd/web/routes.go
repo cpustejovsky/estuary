@@ -11,7 +11,7 @@ func (app *application) routes() http.Handler {
 
 	//Auth Routes
 	mux.Post("/api/signup", http.HandlerFunc(app.signup))
-	mux.Post("/api/login", http.HandlerFunc(app.placeholder))
+	mux.Post("/api/login", http.HandlerFunc(app.login))
 	mux.Get("/api/logout", http.HandlerFunc(app.placeholder))
 	mux.Get("/auth/google", http.HandlerFunc(app.placeholder))
 	mux.Get("/auth/google/callback", http.HandlerFunc(app.placeholder))

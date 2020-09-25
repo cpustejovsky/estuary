@@ -50,10 +50,36 @@ func (app *application) signup(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, models.ErrDuplicateEmail) {
 			// form.Errors.Add("email", "Address is already in use")
 			// app.render(w, r, "signup.page.tmpl", &templateData{Form: form})
+			//TODO: communicate serverside errors to front-end from golang to react
 			fmt.Println("email address is already in use")
 		} else {
 			app.serverError(w, err)
 		}
 		return
 	}
+}
+
+func (app *application) login(w http.ResponseWriter, r *http.Request) {
+	decoder := json.NewDecoder(r.Body)
+
+	var user FormUser
+	err := decoder.Decode(&user)
+	if err != nil {
+		fmt.Println(http.StatusBadRequest)
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+	fmt.Println(user)
+	id, err := app.users.Authenticate(user.EmailAddress, user.Password)
+	if err != nil {
+		if errors.Is(err, models.ErrInvalidCredentials) {
+			// form.Errors.Add("generic", "Email or Password is incorrect")
+			// app.render(w, r, "login.page.tmpl", &templateData{Form: form})
+			fmt.Println("email address or password was incorrect")
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+	fmt.Println(id)
 }
