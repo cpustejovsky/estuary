@@ -15,8 +15,9 @@ var (
 
 type User struct {
 	ID             uuid.UUID `gorm:"primary_key; unique; type:uuid; column:id; default:uuid_generate_v4()"`
-	Name           string
-	Email          string
+	FirstName      string
+	LastName       string
+	EmailAddress          string
 	HashedPassword []byte
 	CreatedAt      time.Time
 	UpdatedAt      time.Time

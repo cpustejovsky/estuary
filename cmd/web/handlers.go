@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -23,6 +24,22 @@ func (app *application) getUser(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "")
 }
 
+type FormUser struct {
+	FirstName    string
+	LastName     string
+	EmailAddress string
+	Password     string
+}
+
 func (app *application) signup(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("hit the signup route")
+	decoder := json.NewDecoder(r.Body)
+
+	var user FormUser
+	err := decoder.Decode(&user)
+	if err != nil {
+		fmt.Println(http.StatusBadRequest)
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+	fmt.Println(user)
 }
