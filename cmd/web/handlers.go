@@ -2,9 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
+
+	"github.com/cpustejovsky/estuary/pkg/models"
 )
 
 func (app *application) placeholder(w http.ResponseWriter, r *http.Request) {
@@ -42,5 +45,15 @@ func (app *application) signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println(user)
-	app.users.Insert
+	err = app.users.Insert(user.FirstName, user.LastName, user.EmailAddress, user.Password)
+	if err != nil {
+		if errors.Is(err, models.ErrDuplicateEmail) {
+			// form.Errors.Add("email", "Address is already in use")
+			// app.render(w, r, "signup.page.tmpl", &templateData{Form: form})
+			fmt.Println("email address is already in use")
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
 }
