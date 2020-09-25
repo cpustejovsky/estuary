@@ -17,13 +17,14 @@ type User struct {
 	ID             uuid.UUID `gorm:"primary_key; unique; type:uuid; column:id; default:uuid_generate_v4()"`
 	FirstName      string
 	LastName       string
-	EmailAddress          string
+	EmailAddress   string
 	HashedPassword []byte
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 	DeletedAt      *time.Time
 	EmailUpdates   bool
 	AdvancedView   bool
+	Active         bool
 }
 
 type Note struct {
