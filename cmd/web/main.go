@@ -37,7 +37,7 @@ type application struct {
 	infoLog  *log.Logger
 	users    interface {
 		Insert(string, string, string, string) error
-		Authenticate(string, string) (int, error)
+		Authenticate(string, string) (string, error)
 		Get(int) (*models.User, error)
 	}
 }

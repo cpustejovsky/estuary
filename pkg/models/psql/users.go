@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"errors"
 
+	"github.com/google/uuid"
+
 	"github.com/cpustejovsky/estuary/pkg/models"
 	"github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
@@ -35,30 +37,30 @@ func (m *UserModel) Insert(first_name, last_name, email, password string) error 
 	return nil
 }
 
-func (m *UserModel) Authenticate(email, password string) (int, error) {
-	var id int
+func (m *UserModel) Authenticate(email, password string) (string, error) {
+	var id uuid.UUID
 	var hashedPassword []byte
-	stmt := "SELECT id, hashed_password FROM users WHERE email = $2 AND active = TRUE"
+	stmt := "SELECT id, hashed_password FROM users WHERE email = $1 AND active = TRUE"
 	row := m.DB.QueryRow(stmt, email)
 	err := row.Scan(&id, &hashedPassword)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return 0, models.ErrInvalidCredentials
+			return "error", models.ErrInvalidCredentials
 		} else {
-			return 0, err
+			return "error", err
 		}
 	}
 
 	err = bcrypt.CompareHashAndPassword(hashedPassword, []byte(password))
 	if err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-			return 0, models.ErrInvalidCredentials
+			return "error", models.ErrInvalidCredentials
 		} else {
-			return 0, err
+			return "error", err
 		}
 	}
 
-	return id, nil
+	return id.String(), nil
 }
 
 func (m *UserModel) Get(id int) (*models.User, error) {
