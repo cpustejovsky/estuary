@@ -31,7 +31,7 @@ func (app *application) isAuthenticated(r *http.Request) bool {
 	return isAuthenticated
 }
 
-func (app *application) authenticateAndRedirect(w http.ResponseWriter, r *http.Request, email, password string) {
+func (app *application) authenticateAndReturnID(w http.ResponseWriter, r *http.Request, email, password string) {
 	id, err := app.users.Authenticate(email, password)
 	if err != nil {
 		if errors.Is(err, models.ErrInvalidCredentials) {
@@ -42,5 +42,5 @@ func (app *application) authenticateAndRedirect(w http.ResponseWriter, r *http.R
 		return
 	}
 	app.session.Put(r, "authenticatedUserID", id)
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	fmt.Fprint(w, app.session.GetString(r, "authenticatedUserID"))
 }

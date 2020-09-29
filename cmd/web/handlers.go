@@ -78,7 +78,7 @@ func (app *application) signup(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	app.authenticateAndRedirect(w, r, user.EmailAddress, user.Password)
+	app.authenticateAndReturnID(w, r, user.EmailAddress, user.Password)
 }
 
 func (app *application) login(w http.ResponseWriter, r *http.Request) {
@@ -91,7 +91,7 @@ func (app *application) login(w http.ResponseWriter, r *http.Request) {
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
-	app.authenticateAndRedirect(w, r, user.EmailAddress, user.Password)
+	app.authenticateAndReturnID(w, r, user.EmailAddress, user.Password)
 }
 
 func (app *application) logout(w http.ResponseWriter, r *http.Request) {
