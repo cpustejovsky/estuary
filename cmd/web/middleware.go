@@ -83,9 +83,7 @@ func (app *application) requireAuthentication(next http.Handler) http.Handler {
 }
 
 func noSurf(next http.Handler) http.Handler {
-	// csrfHandler := nosurf.New(next)
 	key := os.Getenv("CSRF_AUTH_KEY")
-	csrfMiddleware := csrf.Protect([]byte(key))
-
+	csrfMiddleware := csrf.Protect([]byte(key), csrf.Secure(false))
 	return csrfMiddleware(next)
 }

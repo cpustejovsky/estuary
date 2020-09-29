@@ -30,8 +30,6 @@ func (app *application) getUser(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) getCSRFToken(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("X-CSRF-Token", csrf.Token(r))
-	// token := csrf.Token(r)
-	// fmt.Fprint(w, token)
 }
 
 type FormUser struct {
