@@ -40,6 +40,7 @@ type application struct {
 		Authenticate(string, string) (string, error)
 		Get(string) (*models.User, error)
 		Update(string, string, string, bool, bool) (*models.User, error)
+		Delete(string) error
 	}
 }
 

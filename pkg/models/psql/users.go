@@ -123,3 +123,18 @@ func (m *UserModel) Update(id, FirstName, LastName string, EmailUpdates, Advance
 	}
 	return u, nil
 }
+
+func (m *UserModel) Delete(id string) error {
+	sqlStatement := `
+	DELETE FROM users
+	WHERE id = $1;`
+	_, err := m.DB.Exec(sqlStatement, id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.ErrNoRecord
+		} else {
+			return err
+		}
+	}
+	return nil
+}

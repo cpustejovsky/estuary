@@ -25,7 +25,7 @@ func (app *application) routes() http.Handler {
 	//User Routes
 	mux.Get("/api/user", dynamicMiddleware.Append(app.requireAuthentication).ThenFunc(app.getUser))
 	mux.Patch("/api/user", dynamicMiddleware.Append(app.requireAuthentication).ThenFunc(app.updateUser))
-	mux.Del("/api/user", dynamicMiddleware.Append(app.requireAuthentication).ThenFunc(app.placeholder))
+	mux.Del("/api/user", dynamicMiddleware.Append(app.requireAuthentication).ThenFunc(app.deleteUser))
 
 	//Notes Routes
 	mux.Get("/api/notes/category/:name", dynamicMiddleware.Append(app.requireAuthentication).ThenFunc(app.getNote))

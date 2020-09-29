@@ -103,10 +103,6 @@ func (app *application) updateUser(w http.ResponseWriter, r *http.Request) {
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
-	fmt.Println(user.FirstName)
-	fmt.Println(user.LastName)
-	fmt.Println(user.EmailUpdates)
-	fmt.Println(user.AdvancedView)
 	u, err := app.users.Update(uuid, user.FirstName, user.LastName, user.EmailUpdates, user.AdvancedView)
 	if err != nil {
 		fmt.Println(err)
@@ -118,6 +114,16 @@ func (app *application) updateUser(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 	}
 	fmt.Fprint(w, string(b))
+}
+
+func (app *application) deleteUser(w http.ResponseWriter, r *http.Request) {
+	uuid := app.session.GetString(r, "authenticatedUserID")
+	err := app.users.Delete(uuid)
+	if err != nil {
+		fmt.Println(err)
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
 }
 
 //Note Routes
