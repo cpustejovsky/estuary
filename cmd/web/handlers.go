@@ -24,8 +24,26 @@ func (app *application) getNote(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, id)
 }
 
+type User struct {
+	FirstName    string
+	LastName     string
+	EmailAddress string
+}
+
 func (app *application) getUser(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "You got the user!!")
+	u, err := app.users.Get(app.session.GetString(r, "authenticatedUserID"))
+	if errors.Is(err, models.ErrNoRecord) || !u.Active {
+		app.session.Remove(r, "authenticatedUserID")
+		return
+	} else if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	b, err := json.Marshal(u)
+	if err != nil {
+		app.serverError(w, err)
+	}
+	fmt.Fprint(w, string(b))
 }
 
 func (app *application) getCSRFToken(w http.ResponseWriter, r *http.Request) {
@@ -53,8 +71,6 @@ func (app *application) signup(w http.ResponseWriter, r *http.Request) {
 	err = app.users.Insert(user.FirstName, user.LastName, user.EmailAddress, user.Password)
 	if err != nil {
 		if errors.Is(err, models.ErrDuplicateEmail) {
-			// form.Errors.Add("email", "Address is already in use")
-			// app.render(w, r, "signup.page.tmpl", &templateData{Form: form})
 			//TODO: communicate serverside errors to front-end from golang to react
 			fmt.Println("email address is already in use")
 		} else {
