@@ -5,9 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/cpustejovsky/estuary/pkg/models"
-	"github.com/justinas/nosurf"
+	"github.com/gorilla/csrf"
 )
 
 func secureHeaders(next http.Handler) http.Handler {
@@ -82,12 +83,9 @@ func (app *application) requireAuthentication(next http.Handler) http.Handler {
 }
 
 func noSurf(next http.Handler) http.Handler {
-	csrfHandler := nosurf.New(next)
-	csrfHandler.SetBaseCookie(http.Cookie{
-		HttpOnly: true,
-		Path:     "/",
-		Secure:   true,
-	})
+	// csrfHandler := nosurf.New(next)
+	key := os.Getenv("CSRF_AUTH_KEY")
+	csrfMiddleware := csrf.Protect([]byte(key))
 
-	return csrfHandler
+	return csrfMiddleware(next)
 }
