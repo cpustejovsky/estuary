@@ -9,14 +9,14 @@ import (
 
 func (app *application) routes() http.Handler {
 	standardMiddleware := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
-	dynamicMiddleware := alice.New(app.session.Enable, noSurf, app.authenticate)
+	dynamicMiddleware := alice.New(app.session.Enable /*noSurf*/, app.authenticate)
 
 	mux := pat.New()
 
 	//Auth Routes
 	mux.Post("/api/signup", dynamicMiddleware.ThenFunc(app.signup))
 	mux.Post("/api/login", dynamicMiddleware.ThenFunc(app.login))
-	mux.Get("/api/logout", dynamicMiddleware.Append(app.requireAuthentication).ThenFunc(app.placeholder))
+	mux.Get("/api/logout", dynamicMiddleware.Append(app.requireAuthentication).ThenFunc(app.logout))
 	mux.Get("/auth/google", dynamicMiddleware.ThenFunc(app.placeholder))
 	mux.Get("/auth/google/callback", dynamicMiddleware.ThenFunc(app.placeholder))
 

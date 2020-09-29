@@ -24,7 +24,7 @@ func (app *application) getNote(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) getUser(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "")
+	fmt.Fprint(w, "You got the user!!")
 }
 
 type FormUser struct {
@@ -73,13 +73,18 @@ func (app *application) login(w http.ResponseWriter, r *http.Request) {
 	id, err := app.users.Authenticate(user.EmailAddress, user.Password)
 	if err != nil {
 		if errors.Is(err, models.ErrInvalidCredentials) {
-			// form.Errors.Add("generic", "Email or Password is incorrect")
-			// app.render(w, r, "login.page.tmpl", &templateData{Form: form})
 			fmt.Println("email address or password was incorrect")
 		} else {
 			app.serverError(w, err)
 		}
 		return
 	}
-	fmt.Println(id)
+	app.session.Put(r, "authenticatedUserID", id)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (app *application) logout(w http.ResponseWriter, r *http.Request) {
+	app.session.Remove(r, "authenticatedUserID")
+	app.session.Put(r, "flash", "You've been logged out successfully")
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

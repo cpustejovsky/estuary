@@ -38,7 +38,7 @@ type application struct {
 	users    interface {
 		Insert(string, string, string, string) error
 		Authenticate(string, string) (string, error)
-		Get(int) (*models.User, error)
+		Get(string) (*models.User, error)
 	}
 }
 
