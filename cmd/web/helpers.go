@@ -1,9 +1,12 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"runtime/debug"
+
+	"github.com/cpustejovsky/estuary/pkg/models"
 )
 
 func (app *application) serverError(w http.ResponseWriter, err error) {
@@ -26,4 +29,18 @@ func (app *application) isAuthenticated(r *http.Request) bool {
 		return false
 	}
 	return isAuthenticated
+}
+
+func (app *application) authenticateAndRedirect(w http.ResponseWriter, r *http.Request, email, password string) {
+	id, err := app.users.Authenticate(email, password)
+	if err != nil {
+		if errors.Is(err, models.ErrInvalidCredentials) {
+			fmt.Println("email address or password was incorrect")
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+	app.session.Put(r, "authenticatedUserID", id)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

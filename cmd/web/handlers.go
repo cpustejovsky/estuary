@@ -62,6 +62,7 @@ func (app *application) signup(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+	app.authenticateAndRedirect(w, r, user.EmailAddress, user.Password)
 }
 
 func (app *application) login(w http.ResponseWriter, r *http.Request) {
@@ -74,18 +75,7 @@ func (app *application) login(w http.ResponseWriter, r *http.Request) {
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
-	fmt.Println(user)
-	id, err := app.users.Authenticate(user.EmailAddress, user.Password)
-	if err != nil {
-		if errors.Is(err, models.ErrInvalidCredentials) {
-			fmt.Println("email address or password was incorrect")
-		} else {
-			app.serverError(w, err)
-		}
-		return
-	}
-	app.session.Put(r, "authenticatedUserID", id)
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	app.authenticateAndRedirect(w, r, user.EmailAddress, user.Password)
 }
 
 func (app *application) logout(w http.ResponseWriter, r *http.Request) {
