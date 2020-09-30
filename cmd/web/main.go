@@ -39,6 +39,7 @@ type application struct {
 		Insert(string, string, string, string) error
 		Authenticate(string, string) (string, error)
 		Get(string) (*models.User, error)
+		CheckForEmail(string) (bool, error)
 		Update(string, string, string, bool, bool) (*models.User, error)
 		Delete(string) error
 	}

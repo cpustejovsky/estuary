@@ -18,6 +18,8 @@ func (app *application) routes() http.Handler {
 	mux.Post("/api/signup", dynamicMiddleware.ThenFunc(app.signup))
 	mux.Post("/api/login", dynamicMiddleware.ThenFunc(app.login))
 	mux.Get("/api/logout", dynamicMiddleware.Append(app.requireAuthentication).ThenFunc(app.logout))
+	mux.Post("/api/password-reset", dynamicMiddleware.ThenFunc(app.passwordReset))
+	
 	//TODO: add Google SSO
 	// mux.Get("/auth/google", dynamicMiddleware.ThenFunc(app.placeholder))
 	// mux.Get("/auth/google/callback", dynamicMiddleware.ThenFunc(app.placeholder))

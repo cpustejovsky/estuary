@@ -73,6 +73,26 @@ func (app *application) logout(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
+func (app *application) passwordReset(w http.ResponseWriter, r *http.Request) {
+	decoder := json.NewDecoder(r.Body)
+
+	var user FormUser
+	err := decoder.Decode(&user)
+	if err != nil {
+		fmt.Println(http.StatusBadRequest)
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	ok, err := app.users.CheckForEmail(user.EmailAddress)
+	if err != nil {
+		fmt.Println(http.StatusBadRequest)
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+	fmt.Fprint(w, ok)
+}
+
 //User Routes
 
 func (app *application) getUser(w http.ResponseWriter, r *http.Request) {

@@ -90,6 +90,23 @@ func (m *UserModel) Get(id string) (*models.User, error) {
 	return u, nil
 }
 
+func (m *UserModel) CheckForEmail(email string) (bool, error) {
+	u := &models.User{}
+	stmt := `
+	SELECT active 
+	FROM users 
+	WHERE email = $1`
+	err := m.DB.QueryRow(stmt, email).Scan(&u.Active)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return false, models.ErrNoRecord
+		} else {
+			return false, err
+		}
+	}
+	return u.Active, nil
+}
+
 func (m *UserModel) Update(id, FirstName, LastName string, EmailUpdates, AdvancedView bool) (*models.User, error) {
 	u := &models.User{}
 	uuid, err := uuid.Parse(id)
