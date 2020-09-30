@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/cpustejovsky/estuary/pkg/models"
+	"github.com/cpustejovsky/estuary/pkg/mailer"
 	"github.com/gorilla/csrf"
 )
 
@@ -89,6 +90,10 @@ func (app *application) passwordReset(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(http.StatusBadRequest)
 		app.clientError(w, http.StatusBadRequest)
 		return
+	}
+	if ok == true {
+		token := "testy-mctestface"
+		mailer.SendPasswordResetEmail(user.EmailAddress, token, app.)
 	}
 	fmt.Fprint(w, ok)
 }

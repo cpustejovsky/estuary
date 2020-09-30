@@ -14,6 +14,7 @@ import (
 	"github.com/golangcollege/sessions"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"github.com/mailgun/mailgun-go/v4"
 )
 
 const (
@@ -32,10 +33,11 @@ type contextKey string
 const contextKeyIsAuthenticated = contextKey("isAuthenticated")
 
 type application struct {
-	errorLog *log.Logger
-	infoLog  *log.Logger
-	session  *sessions.Session
-	users    interface {
+	errorLog   *log.Logger
+	infoLog    *log.Logger
+	mgInstance *mailgun.MailgunImpl
+	session    *sessions.Session
+	users      interface {
 		Insert(string, string, string, string) error
 		Authenticate(string, string) (string, error)
 		Get(string) (*models.User, error)
@@ -85,12 +87,20 @@ func main() {
 	session := sessions.New(sessionSecret)
 	session.Lifetime = 12 * time.Hour
 
+	//MailGun Set Up
+	mg, err := mailgun.NewMailgunFromEnv()
+	if err != nil {
+		log.Fatal(err)
+	}
+	mgInstance := mg
+
 	// Application and Server Initialization
 	app := &application{
-		errorLog: errorLog,
-		infoLog:  infoLog,
-		session:  session,
-		users:    &psql.UserModel{DB: db},
+		errorLog:   errorLog,
+		infoLog:    infoLog,
+		mgInstance: mgInstance,
+		session:    session,
+		users:      &psql.UserModel{DB: db},
 	}
 
 	srv := &http.Server{

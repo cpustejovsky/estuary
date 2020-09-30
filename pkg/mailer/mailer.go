@@ -20,7 +20,7 @@ func formatHtml(token string, m *mailgun.Message) {
 	m.SetHtml(message.String())
 }
 
-func SendEmail(recipient, token string, mg *mailgun.MailgunImpl) error {
+func SendPasswordResetEmail(recipient, token string, mg *mailgun.MailgunImpl) error {
 	sender := "password-reset@estuaryapp.com"
 	subject := "Password Reset"
 	html := ""
