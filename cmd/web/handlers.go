@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/google/uuid"
+
 	"github.com/cpustejovsky/estuary/pkg/mailer"
 	"github.com/cpustejovsky/estuary/pkg/models"
 	"github.com/gorilla/csrf"
@@ -97,10 +99,16 @@ func (app *application) sendPasswordResetEmail(w http.ResponseWriter, r *http.Re
 	}
 	if ok == true {
 		//create token
-		token := "testy-mctestface"
+		id := uuid.New()
 		//insert record into PasswordResetToken
+		err := app.resetTokens.Insert(id, user.EmailAddress)
+		if err != nil {
+			fmt.Println(err)
+			app.clientError(w, http.StatusBadRequest)
+			return
+		}
 		//then send email
-		mailer.SendPasswordResetEmail(user.EmailAddress, token, app.mgInstance)
+		mailer.SendPasswordResetEmail(user.EmailAddress, id.String(), app.mgInstance)
 	}
 	fmt.Fprint(w, true)
 }

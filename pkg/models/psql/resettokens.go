@@ -13,12 +13,12 @@ type ResetTokenModel struct {
 	DB *sql.DB
 }
 
-func (m *ResetTokenModel) Insert(email string) error {
+func (m *ResetTokenModel) Insert(id uuid.UUID, email string) error {
 	stmt := `
-	INSERT INTO password_reset_tokens (email) 
-	VALUES($1)`
+	INSERT INTO reset_tokens (id, email) 
+	VALUES($1, $2)`
 
-	_, err := m.DB.Exec(stmt, email)
+	_, err := m.DB.Exec(stmt, id, email)
 	if err != nil {
 		return err
 	}
@@ -34,7 +34,7 @@ func (m *ResetTokenModel) Get(id, email string) (*models.ResetToken, error) {
 	}
 	stmt := `
 	SELECT id, email, created 
-	FROM password_reset_tokens 
+	FROM reset_tokens 
 	WHERE id = $1 AND email = $2`
 	err = m.DB.QueryRow(stmt, uuid, email).Scan(&r.ID, &r.EmailAddress, &r.CreatedAt)
 	if err != nil {

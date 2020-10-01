@@ -12,6 +12,7 @@ import (
 	"github.com/cpustejovsky/estuary/pkg/models"
 	"github.com/cpustejovsky/estuary/pkg/models/psql"
 	"github.com/golangcollege/sessions"
+	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/mailgun/mailgun-go/v4"
@@ -33,11 +34,15 @@ type contextKey string
 const contextKeyIsAuthenticated = contextKey("isAuthenticated")
 
 type application struct {
-	errorLog   *log.Logger
-	infoLog    *log.Logger
-	mgInstance *mailgun.MailgunImpl
-	session    *sessions.Session
-	users      interface {
+	errorLog    *log.Logger
+	infoLog     *log.Logger
+	mgInstance  *mailgun.MailgunImpl
+	session     *sessions.Session
+	resetTokens interface {
+		Insert(id uuid.UUID, email string) error
+		Get(string, string) (*models.ResetToken, error)
+	}
+	users interface {
 		Insert(string, string, string, string) error
 		Authenticate(string, string) (string, error)
 		Get(string) (*models.User, error)
@@ -96,11 +101,12 @@ func main() {
 
 	// Application and Server Initialization
 	app := &application{
-		errorLog:   errorLog,
-		infoLog:    infoLog,
-		mgInstance: mgInstance,
-		session:    session,
-		users:      &psql.UserModel{DB: db},
+		errorLog:    errorLog,
+		infoLog:     infoLog,
+		mgInstance:  mgInstance,
+		session:     session,
+		resetTokens: &psql.ResetTokenModel{DB: db},
+		users:       &psql.UserModel{DB: db},
 	}
 
 	srv := &http.Server{
