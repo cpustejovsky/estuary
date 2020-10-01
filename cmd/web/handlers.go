@@ -84,9 +84,13 @@ func (app *application) sendPasswordResetEmail(w http.ResponseWriter, r *http.Re
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
-
+	//the handler always reurns true unless an unexpected error occurs in which case it returns "error"
+	//this prevents user enumeration
 	ok, err := app.users.CheckForEmail(user.EmailAddress)
-	if err != nil {
+	if errors.Is(err, models.ErrNoRecord) {
+		fmt.Fprint(w, true)
+		return
+	} else if err != nil {
 		fmt.Println(http.StatusBadRequest)
 		app.clientError(w, http.StatusBadRequest)
 		return
@@ -98,7 +102,7 @@ func (app *application) sendPasswordResetEmail(w http.ResponseWriter, r *http.Re
 		//then send email
 		mailer.SendPasswordResetEmail(user.EmailAddress, token, app.mgInstance)
 	}
-	fmt.Fprint(w, ok)
+	fmt.Fprint(w, true)
 }
 
 func (app *application) resetPassword(w http.ResponseWriter, r *http.Request) {
