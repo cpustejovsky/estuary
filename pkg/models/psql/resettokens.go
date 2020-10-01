@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -36,8 +37,12 @@ func (m *ResetTokenModel) Get(id, email string) (*models.ResetToken, error) {
 	stmt := `
 	SELECT id, email, created 
 	FROM reset_tokens 
-	WHERE id = $1 AND email = $2 and created > (now() - interval '1 hour') at time zone 'utc'`
+	WHERE id = $1 AND email = $2`
 	err = m.DB.QueryRow(stmt, uuid, email).Scan(&r.ID, &r.EmailAddress, &r.CreatedAt)
+	hourAgo := time.Now().Add(-1 * time.Hour)
+	if hourAgo.After(r.CreatedAt) {
+		return nil, errors.New("expired token")
+	}
 	if err != nil {
 		fmt.Println(err)
 		if errors.Is(err, sql.ErrNoRows) {

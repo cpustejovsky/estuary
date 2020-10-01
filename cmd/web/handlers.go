@@ -126,6 +126,9 @@ func (app *application) resetPassword(w http.ResponseWriter, r *http.Request) {
 	resetToken, err := app.resetTokens.Get(user.Token, user.EmailAddress)
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) || err.Error() == fmt.Sprintf("invalid UUID length: %d", len(user.Token)) {
+			fmt.Fprint(w, "no token found")
+			return
+		} else if err.Error() == "expired token" {
 			fmt.Fprint(w, err)
 			return
 		} else {
