@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/cpustejovsky/estuary/pkg/models"
 	"github.com/cpustejovsky/estuary/pkg/mailer"
+	"github.com/cpustejovsky/estuary/pkg/models"
 	"github.com/gorilla/csrf"
 )
 
@@ -74,7 +74,7 @@ func (app *application) logout(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-func (app *application) passwordReset(w http.ResponseWriter, r *http.Request) {
+func (app *application) sendPasswordResetEmail(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 
 	var user FormUser
@@ -92,10 +92,23 @@ func (app *application) passwordReset(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if ok == true {
+		//create token
 		token := "testy-mctestface"
-		mailer.SendPasswordResetEmail(user.EmailAddress, token, app.)
+		//insert record into PasswordResetToken
+		//then send email
+		mailer.SendPasswordResetEmail(user.EmailAddress, token, app.mgInstance)
 	}
 	fmt.Fprint(w, ok)
+}
+
+func (app *application) resetPassword(w http.ResponseWriter, r *http.Request) {
+	//extract token from query parameter
+	//extract email address from form
+	//check if pw req token CreatedAt < Now - (30 minutes)
+	//if, run update with hashed password
+	//else, return an error that either let's the user know it's expired or that there was never a UUID issued
+
+	//TODO:"pipe that sort of info into fail2ban and if someone gets cheeky give them a 12h IP ban." - advice from a Discord
 }
 
 //User Routes
