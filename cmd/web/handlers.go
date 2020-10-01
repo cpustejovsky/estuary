@@ -26,6 +26,7 @@ type FormUser struct {
 	Password     string
 	EmailUpdates bool
 	AdvancedView bool
+	Token        string
 }
 
 //Auth Routes
@@ -43,7 +44,6 @@ func (app *application) signup(w http.ResponseWriter, r *http.Request) {
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
-	fmt.Println(user)
 	err = app.users.Insert(user.FirstName, user.LastName, user.EmailAddress, user.Password)
 	if err != nil {
 		if errors.Is(err, models.ErrDuplicateEmail) {
@@ -114,8 +114,42 @@ func (app *application) sendPasswordResetEmail(w http.ResponseWriter, r *http.Re
 }
 
 func (app *application) resetPassword(w http.ResponseWriter, r *http.Request) {
-	//extract token from query parameter
-	//extract email address from form
+	decoder := json.NewDecoder(r.Body)
+
+	var user FormUser
+	err := decoder.Decode(&user)
+	if err != nil {
+		fmt.Println(http.StatusBadRequest)
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+	fmt.Println(user.Token)
+	fmt.Println(user.EmailAddress)
+	fmt.Println(user.Password)
+	resetToken, err := app.resetTokens.Get(user.Token, user.EmailAddress)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+			fmt.Fprint(w, "no token found")
+			return
+		} else {
+			fmt.Fprint(w, err)
+			return
+		}
+	}
+	uuid, err := uuid.Parse(user.Token)
+	if err != nil {
+		fmt.Fprint(w, err)
+		return
+	}
+	if resetToken.ID == uuid {
+		err = app.users.UpdatePassword(user.EmailAddress, user.Password)
+		if err != nil {
+			fmt.Fprint(w, err)
+			return
+		}
+		fmt.Fprint(w, "success")
+	}
+
 	//check if pw req token CreatedAt < Now - (30 minutes)
 	//if, run update with hashed password
 	//else, return an error that either let's the user know it's expired or that there was never a UUID issued
