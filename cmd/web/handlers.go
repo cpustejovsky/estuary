@@ -19,29 +19,15 @@ func (app *application) placeholder(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Hello, World")
 }
 
-type FormUser struct {
-	FirstName    string
-	LastName     string
-	EmailAddress string
-	Password     string
-	EmailUpdates bool
-	AdvancedView bool
-	Token        string
-}
-
 //Auth Routes
 func (app *application) getCSRFToken(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("X-CSRF-Token", csrf.Token(r))
 }
 
 func (app *application) signup(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
-
-	var user FormUser
-	err := decoder.Decode(&user)
+	user, err := app.decodeUserForm(r)
 	if err != nil {
-		fmt.Println(http.StatusBadRequest)
-		app.clientError(w, http.StatusBadRequest)
+		app.serverError(w, err)
 		return
 	}
 	err = app.users.Insert(user.FirstName, user.LastName, user.EmailAddress, user.Password)
@@ -58,13 +44,9 @@ func (app *application) signup(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) login(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
-
-	var user FormUser
-	err := decoder.Decode(&user)
+	user, err := app.decodeUserForm(r)
 	if err != nil {
-		fmt.Println(http.StatusBadRequest)
-		app.clientError(w, http.StatusBadRequest)
+		app.serverError(w, err)
 		return
 	}
 	app.authenticateAndReturnID(w, r, user.EmailAddress, user.Password)
@@ -77,13 +59,9 @@ func (app *application) logout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) sendPasswordResetEmail(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
-
-	var user FormUser
-	err := decoder.Decode(&user)
+	user, err := app.decodeUserForm(r)
 	if err != nil {
-		fmt.Println(http.StatusBadRequest)
-		app.clientError(w, http.StatusBadRequest)
+		app.serverError(w, err)
 		return
 	}
 	//the handler always reurns true unless an unexpected error occurs in which case it returns "error"
@@ -114,13 +92,9 @@ func (app *application) sendPasswordResetEmail(w http.ResponseWriter, r *http.Re
 }
 
 func (app *application) resetPassword(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
-
-	var user FormUser
-	err := decoder.Decode(&user)
+	user, err := app.decodeUserForm(r)
 	if err != nil {
-		fmt.Println(http.StatusBadRequest)
-		app.clientError(w, http.StatusBadRequest)
+		app.serverError(w, err)
 		return
 	}
 	resetToken, err := app.resetTokens.Get(user.Token, user.EmailAddress)
@@ -177,14 +151,9 @@ func (app *application) getUser(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) updateUser(w http.ResponseWriter, r *http.Request) {
 	uuid := app.session.GetString(r, "authenticatedUserID")
-
-	decoder := json.NewDecoder(r.Body)
-
-	var user FormUser
-	err := decoder.Decode(&user)
+	user, err := app.decodeUserForm(r)
 	if err != nil {
-		fmt.Println(http.StatusBadRequest)
-		app.clientError(w, http.StatusBadRequest)
+		app.serverError(w, err)
 		return
 	}
 	u, err := app.users.Update(uuid, user.FirstName, user.LastName, user.EmailUpdates, user.AdvancedView)

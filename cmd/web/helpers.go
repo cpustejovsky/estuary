@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -43,4 +44,25 @@ func (app *application) authenticateAndReturnID(w http.ResponseWriter, r *http.R
 	}
 	app.session.Put(r, "authenticatedUserID", id)
 	fmt.Fprint(w, app.session.GetString(r, "authenticatedUserID"))
+}
+
+type FormUser struct {
+	FirstName    string
+	LastName     string
+	EmailAddress string
+	Password     string
+	EmailUpdates bool
+	AdvancedView bool
+	Token        string
+}
+
+func (app *application) decodeUserForm(r *http.Request) (FormUser, error) {
+	decoder := json.NewDecoder(r.Body)
+
+	var user FormUser
+	err := decoder.Decode(&user)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
 }
