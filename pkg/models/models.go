@@ -27,6 +27,12 @@ type User struct {
 	Active         bool
 }
 
+type PasswordResetToken struct {
+	ID           uuid.UUID `gorm:"primary_key; unique; type:uuid; column:id; default:uuid_generate_v4()"`
+	EmailAddress string
+	CreatedAt    time.Time
+}
+
 type Note struct {
 	Content       string
 	Category      string
