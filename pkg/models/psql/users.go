@@ -141,6 +141,26 @@ func (m *UserModel) Update(id, FirstName, LastName string, EmailUpdates, Advance
 	return u, nil
 }
 
+func (m *UserModel) UpdatePassword(email, password string) error {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 12)
+	if err != nil {
+		return err
+	}
+	stmt := `
+	UPDATE users
+	SET hashed_password = $2
+	WHERE email = $1`
+	_, err = m.DB.Exec(stmt, email, hashedPassword)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.ErrNoRecord
+		} else {
+			return err
+		}
+	}
+	return nil
+}
+
 func (m *UserModel) Delete(id string) error {
 	sqlStatement := `
 	DELETE FROM users
