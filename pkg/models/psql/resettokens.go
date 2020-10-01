@@ -3,6 +3,7 @@ package psql
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/google/uuid"
 
@@ -35,9 +36,10 @@ func (m *ResetTokenModel) Get(id, email string) (*models.ResetToken, error) {
 	stmt := `
 	SELECT id, email, created 
 	FROM reset_tokens 
-	WHERE id = $1 AND email = $2`
+	WHERE id = $1 AND email = $2 and created > (now() - interval '1 hour') at time zone 'utc'`
 	err = m.DB.QueryRow(stmt, uuid, email).Scan(&r.ID, &r.EmailAddress, &r.CreatedAt)
 	if err != nil {
+		fmt.Println(err)
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, models.ErrNoRecord
 		} else {
