@@ -25,6 +25,11 @@ const (
 	dbname = "estuarydev"
 )
 
+var (
+	errorLog *log.Logger
+	infoLog  *log.Logger
+)
+
 type Config struct {
 	Addr string
 }
@@ -57,6 +62,15 @@ func init() {
 	if err := godotenv.Load(); err != nil {
 		log.Print("No .env file found")
 	}
+
+	file, err := os.OpenFile("log.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Logging
+	errorLog = log.New(file, "ERROR\t", log.Ldate|log.LUTC|log.Llongfile)
+	infoLog = log.New(file, "INFO\t", log.Ldate|log.LUTC)
 }
 
 func main() {
@@ -68,10 +82,6 @@ func main() {
 	// Environemntal Variables
 	var password = os.Getenv("TEST_PSQL_PW")
 	var sessionSecret = []byte(os.Getenv("SESSION_SECRET"))
-
-	// Logging
-	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.LUTC|log.Llongfile)
-	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.LUTC)
 
 	// DB Setup
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
