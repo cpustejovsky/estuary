@@ -76,16 +76,13 @@ func (app *application) sendPasswordResetEmail(w http.ResponseWriter, r *http.Re
 		return
 	}
 	if ok == true {
-		//create token
 		id := uuid.New()
-		//insert record into PasswordResetToken
 		err := app.resetTokens.Insert(id, user.EmailAddress)
 		if err != nil {
 			fmt.Println(err)
 			app.clientError(w, http.StatusBadRequest)
 			return
 		}
-		//then send email
 		mailer.SendPasswordResetEmail(user.EmailAddress, id.String(), app.mgInstance)
 	}
 	fmt.Fprint(w, true)
@@ -99,16 +96,13 @@ func (app *application) resetPassword(w http.ResponseWriter, r *http.Request) {
 	}
 	resetToken, err := app.resetTokens.Get(user.Token, user.EmailAddress)
 	if err != nil {
-		if errors.Is(err, models.ErrNoRecord) || err.Error() == fmt.Sprintf("invalid UUID length: %d", len(user.Token)) {
+		if errors.Is(err, models.ErrNoRecord) {
+			//TODO:"pipe that sort of info into fail2ban and if someone gets cheeky give them a 12h IP ban." - advice from a Discord
 			fmt.Fprint(w, "no token found")
-			return
-		} else if err.Error() == "expired token" {
-			fmt.Fprint(w, err)
-			return
 		} else {
 			fmt.Fprint(w, err)
-			return
 		}
+		return
 	}
 	uuid, err := uuid.Parse(user.Token)
 	if err != nil {
@@ -123,12 +117,6 @@ func (app *application) resetPassword(w http.ResponseWriter, r *http.Request) {
 		}
 		fmt.Fprint(w, "success")
 	}
-
-	//check if pw req token CreatedAt < Now - (30 minutes)
-	//if, run update with hashed password
-	//else, return an error that either let's the user know it's expired or that there was never a UUID issued
-
-	//TODO:"pipe that sort of info into fail2ban and if someone gets cheeky give them a 12h IP ban." - advice from a Discord
 }
 
 //User Routes
