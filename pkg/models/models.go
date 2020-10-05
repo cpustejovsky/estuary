@@ -13,7 +13,7 @@ var (
 	ErrDuplicateEmail     = errors.New("models: duplicate email")
 )
 
-type User struct {
+type Account struct {
 	ID             uuid.UUID `gorm:"primary_key; unique; type:uuid; column:id; default:uuid_generate_v4()"`
 	FirstName      string
 	LastName       string
@@ -28,12 +28,13 @@ type User struct {
 }
 
 type ResetToken struct {
-	ID           uuid.UUID `gorm:"primary_key; unique; type:uuid; column:id; default:uuid_generate_v4()"`
+	ID           uuid.UUID
 	EmailAddress string
 	CreatedAt    time.Time
 }
 
 type Note struct {
+	ID            uuid.UUID `gorm:"primary_key; unique; type:uuid; column:id; default:uuid_generate_v4()"`
 	Content       string
 	Category      string
 	Tags          []string
@@ -41,6 +42,7 @@ type Note struct {
 	RemindDate    time.Time
 	Completed     bool
 	CompletedDate time.Time
-	//how to connect to user and project
-	//how to add a dependent on schema
+	//Connect to Account
+	AccountID			uuid.UUID 
+	//Connect to Dependents
 }

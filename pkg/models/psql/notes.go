@@ -11,11 +11,11 @@ import (
 	"github.com/cpustejovsky/estuary/pkg/models"
 )
 
-type ResetTokenModel struct {
+type NotesModel struct {
 	DB *sql.DB
 }
 
-func (m *ResetTokenModel) Insert(id uuid.UUID, email string) error {
+func (m *NotesModel) Insert(id uuid.UUID, email string) error {
 	stmt := `
 	INSERT INTO reset_tokens (token_id, email) 
 	VALUES($1, $2)`
@@ -28,7 +28,7 @@ func (m *ResetTokenModel) Insert(id uuid.UUID, email string) error {
 	return nil
 }
 
-func (m *ResetTokenModel) Get(id, email string) (*models.ResetToken, error) {
+func (m *NotesModel) Get(id, email string) (*models.ResetToken, error) {
 	r := &models.ResetToken{}
 	uuid, err := uuid.Parse(id)
 	if err != nil {

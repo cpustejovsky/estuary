@@ -22,7 +22,7 @@ func (m *UserModel) Insert(first_name, last_name, email, password string) error 
 	}
 
 	stmt := `
-	INSERT INTO users (first_name, last_name, email, hashed_password) 
+	INSERT INTO accounts (first_name, last_name, email, hashed_password) 
 	VALUES($1, $2, $3, $4)`
 
 	_, err = m.DB.Exec(stmt, first_name, last_name, email, string(hashedPassword))
@@ -43,8 +43,8 @@ func (m *UserModel) Authenticate(email, password string) (string, error) {
 	var id uuid.UUID
 	var hashedPassword []byte
 	stmt := `
-	SELECT id, hashed_password 
-	FROM users 
+	SELECT account_id, hashed_password 
+	FROM accounts 
 	WHERE email = $1 AND active = TRUE`
 	row := m.DB.QueryRow(stmt, email)
 	err := row.Scan(&id, &hashedPassword)
@@ -68,16 +68,16 @@ func (m *UserModel) Authenticate(email, password string) (string, error) {
 	return id.String(), nil
 }
 
-func (m *UserModel) Get(id string) (*models.User, error) {
-	u := &models.User{}
+func (m *UserModel) Get(id string) (*models.Account, error) {
+	u := &models.Account{}
 	uuid, err := uuid.Parse(id)
 	if err != nil {
 		return nil, err
 	}
 	stmt := `
-	SELECT id, first_name, last_name, email, created, active 
-	FROM users 
-	WHERE id = $1`
+	SELECT account_id, first_name, last_name, email, created, active 
+	FROM accounts 
+	WHERE account_id = $1`
 	err = m.DB.QueryRow(stmt, uuid).Scan(&u.ID, &u.FirstName, &u.LastName, &u.EmailAddress, &u.CreatedAt, &u.Active)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -91,10 +91,10 @@ func (m *UserModel) Get(id string) (*models.User, error) {
 }
 
 func (m *UserModel) CheckForEmail(email string) (bool, error) {
-	u := &models.User{}
+	u := &models.Account{}
 	stmt := `
 	SELECT active 
-	FROM users 
+	FROM accounts 
 	WHERE email = $1`
 	err := m.DB.QueryRow(stmt, email).Scan(&u.Active)
 	if err != nil {
@@ -107,16 +107,16 @@ func (m *UserModel) CheckForEmail(email string) (bool, error) {
 	return u.Active, nil
 }
 
-func (m *UserModel) Update(id, FirstName, LastName string, EmailUpdates, AdvancedView bool) (*models.User, error) {
-	u := &models.User{}
+func (m *UserModel) Update(id, FirstName, LastName string, EmailUpdates, AdvancedView bool) (*models.Account, error) {
+	u := &models.Account{}
 	uuid, err := uuid.Parse(id)
 	if err != nil {
 		return nil, err
 	}
 	stmt := `
-	UPDATE users
+	UPDATE accounts
 	SET first_name = $2, last_name = $3, email_updates = $4, advanced_view = $5
-	WHERE id = $1`
+	WHERE account_id = $1`
 	_, err = m.DB.Exec(stmt, uuid, FirstName, LastName, EmailUpdates, AdvancedView)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -127,9 +127,9 @@ func (m *UserModel) Update(id, FirstName, LastName string, EmailUpdates, Advance
 	}
 
 	stmt = `
-	SELECT id, first_name, last_name, email_updates, advanced_view 
-	FROM users 
-	WHERE id = $1`
+	SELECT account_id, first_name, last_name, email_updates, advanced_view 
+	FROM accounts 
+	WHERE account_id = $1`
 	err = m.DB.QueryRow(stmt, uuid).Scan(&u.ID, &u.FirstName, &u.LastName, &u.EmailUpdates, &u.AdvancedView)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -147,7 +147,7 @@ func (m *UserModel) UpdatePassword(email, password string) error {
 		return err
 	}
 	stmt := `
-	UPDATE users
+	UPDATE accounts
 	SET hashed_password = $2
 	WHERE email = $1`
 	_, err = m.DB.Exec(stmt, email, hashedPassword)
@@ -163,8 +163,8 @@ func (m *UserModel) UpdatePassword(email, password string) error {
 
 func (m *UserModel) Delete(id string) error {
 	sqlStatement := `
-	DELETE FROM users
-	WHERE id = $1;`
+	DELETE FROM accounts
+	WHERE account_id = $1;`
 	_, err := m.DB.Exec(sqlStatement, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
