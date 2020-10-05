@@ -1,5 +1,5 @@
-CREATE TABLE users (
-    id uuid DEFAULT uuid_generate_v4 (),
+CREATE TABLE accounts (
+    account_id uuid DEFAULT uuid_generate_v4 (),
     first_name VARCHAR NOT NULL,
     last_name VARCHAR NOT NULL,
     email VARCHAR NOT NULL UNIQUE,
@@ -10,5 +10,5 @@ CREATE TABLE users (
     email_updates BOOLEAN DEFAULT false,
     advanced_view BOOLEAN DEFAULT false,
     active BOOLEAN DEFAULT true,
-    PRIMARY KEY (id)
+    PRIMARY KEY (account_id)
 );
