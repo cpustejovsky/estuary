@@ -38,6 +38,7 @@ type Note struct {
 	Content       string
 	Category      string
 	Tags          []string
+	Created       time.Time
 	DueDate       time.Time
 	RemindDate    time.Time
 	Completed     bool

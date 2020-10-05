@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/google/uuid"
 
@@ -15,12 +14,16 @@ type NotesModel struct {
 	DB *sql.DB
 }
 
-func (m *NotesModel) Insert(id uuid.UUID, email string) error {
+func (m *NotesModel) Insert(content, accountId string) error {
+	uuid, err := uuid.Parse(accountId)
+	if err != nil {
+		return err
+	}
 	stmt := `
-	INSERT INTO reset_tokens (token_id, email) 
+	INSERT INTO notes (content, account_id) 
 	VALUES($1, $2)`
 
-	_, err := m.DB.Exec(stmt, id, email)
+	_, err = m.DB.Exec(stmt, content, uuid)
 	if err != nil {
 		return err
 	}
@@ -28,20 +31,22 @@ func (m *NotesModel) Insert(id uuid.UUID, email string) error {
 	return nil
 }
 
-func (m *NotesModel) Get(id, email string) (*models.ResetToken, error) {
-	r := &models.ResetToken{}
-	uuid, err := uuid.Parse(id)
+func (m *NotesModel) GetByCategory(accountId, category string) (*[]models.Note, error) {
+	var notes []models.Note
+	uuid, err := uuid.Parse(accountId)
 	if err != nil {
 		return nil, err
 	}
 	stmt := `
-	SELECT token_id, email, created 
-	FROM reset_tokens 
-	WHERE token_id = $1 AND email = $2`
-	err = m.DB.QueryRow(stmt, uuid, email).Scan(&r.ID, &r.EmailAddress, &r.CreatedAt)
-	hourAgo := time.Now().Add(-1 * time.Hour)
-	if hourAgo.After(r.CreatedAt) {
-		return nil, errors.New("expired token")
+	SELECT content, category, tags, created, due_date
+	FROM notes 
+	WHERE account_id = $1 AND category = $2`
+	rows, err := m.DB.Query(stmt, uuid, category)
+	defer rows.Close()
+	for rows.Next() {
+		n := &models.Note{}
+		err = rows.Scan(&n.Content, &n.Category, &n.Tags, &n.Created, &n.DueDate)
+		notes = append(notes, *n)
 	}
 	if err != nil {
 		fmt.Println(err)
@@ -52,5 +57,5 @@ func (m *NotesModel) Get(id, email string) (*models.ResetToken, error) {
 		}
 	}
 
-	return r, nil
+	return &notes, nil
 }
