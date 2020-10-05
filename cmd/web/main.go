@@ -63,14 +63,14 @@ func init() {
 		log.Print("No .env file found")
 	}
 
-	file, err := os.OpenFile("log.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// file, err := os.OpenFile("log.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	// Logging
-	errorLog = log.New(file, "ERROR\t", log.Ldate|log.LUTC|log.Llongfile)
-	infoLog = log.New(file, "INFO\t", log.Ldate|log.LUTC)
+	errorLog = log.New(os.Stderr, "ERROR\t", log.Ldate|log.LUTC|log.Llongfile)
+	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.LUTC)
 }
 
 func main() {
