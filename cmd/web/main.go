@@ -57,8 +57,9 @@ type application struct {
 		UpdatePassword(string, string) error
 	}
 	notes interface {
-		Insert(string, string) error
+		Insert(string, string) (string, error)
 		GetByCategory(string, string) (*[]models.Note, error)
+		Get(string) (*models.Note, error)
 	}
 }
 

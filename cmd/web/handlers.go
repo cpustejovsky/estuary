@@ -168,19 +168,30 @@ func (app *application) deleteUser(w http.ResponseWriter, r *http.Request) {
 
 //Note Routes
 func (app *application) createNote(w http.ResponseWriter, r *http.Request) {
-	note, err := app.decodeNoteForm(r)
+	noteForm, err := app.decodeNoteForm(r)
 	if err != nil {
 		fmt.Println(err)
 		app.serverError(w, err)
 		return
 	}
 	uuid := app.session.GetString(r, "authenticatedUserID")
-	err = app.notes.Insert(uuid, note.Content)
+	noteId, err := app.notes.Insert(uuid, noteForm.Content)
 	if err != nil {
 		fmt.Println(err)
 		app.serverError(w, err)
 		return
 	}
+	note, err := app.notes.Get(noteId)
+	if err != nil {
+		fmt.Println(err)
+		app.serverError(w, err)
+		return
+	}
+	b, err := json.Marshal(note)
+	if err != nil {
+		app.serverError(w, err)
+	}
+	fmt.Fprint(w, string(b))
 }
 
 func (app *application) getNoteByCategory(w http.ResponseWriter, r *http.Request) {

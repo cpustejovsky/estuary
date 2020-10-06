@@ -14,21 +14,48 @@ type NoteModel struct {
 	DB *sql.DB
 }
 
-func (m *NoteModel) Insert(accountId, content string) error {
-	uuid, err := uuid.Parse(accountId)
+func (m *NoteModel) Insert(accountId, content string) (string, error) {
+	accountUUID, err := uuid.Parse(accountId)
 	if err != nil {
-		return err
+		fmt.Println(err)
+		return "", err
+	}
+	query := `
+	INSERT INTO notes (account_id, content) 
+	VALUES($1, $2) RETURNING note_id`
+	stmt, err := m.DB.Prepare(query)
+	if err != nil {
+		fmt.Println(err)
+		return "", err
+	}
+	defer stmt.Close()
+	var noteId uuid.UUID
+	err = stmt.QueryRow(accountUUID, content).Scan(&noteId)
+	if err != nil {
+		fmt.Println(err)
+		return "", err
+	}
+
+	return noteId.String(), nil
+}
+
+func (m *NoteModel) Get(noteId string) (*models.Note, error) {
+	uuid, err := uuid.Parse(noteId)
+	if err != nil {
+		return nil, err
 	}
 	stmt := `
-	INSERT INTO notes (content, account_id) 
-	VALUES($1, $2)`
-
-	_, err = m.DB.Exec(stmt, content, uuid)
+	SELECT note_id, content, category, created
+	FROM notes 
+	WHERE note_id = $1`
+	n := &models.Note{}
+	row := m.DB.QueryRow(stmt, uuid)
+	err = row.Scan(&n.ID, &n.Content, &n.Category, &n.Created)
 	if err != nil {
-		return err
+		fmt.Println(err)
+		return nil, err
 	}
-
-	return nil
+	return n, nil
 }
 
 func (m *NoteModel) GetByCategory(accountId, category string) (*[]models.Note, error) {
@@ -50,6 +77,10 @@ func (m *NoteModel) GetByCategory(accountId, category string) (*[]models.Note, e
 	for rows.Next() {
 		n := &models.Note{}
 		err = rows.Scan(&n.ID, &n.Content, &n.Category, &n.Created)
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
 		notes = append(notes, *n)
 	}
 	if err != nil {
