@@ -56,6 +56,10 @@ type application struct {
 		Update(string, string, string, bool, bool) (*models.Account, error)
 		UpdatePassword(string, string) error
 	}
+	notes interface {
+		Insert(string, string) error
+		GetByCategory(string, string) (*[]models.Note, error)
+	}
 }
 
 func init() {
@@ -116,6 +120,7 @@ func main() {
 		infoLog:     infoLog,
 		mgInstance:  mgInstance,
 		session:     session,
+		notes:       &psql.NoteModel{DB: db},
 		resetTokens: &psql.ResetTokenModel{DB: db},
 		users:       &psql.UserModel{DB: db},
 	}

@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/google/uuid"
 
@@ -168,11 +167,48 @@ func (app *application) deleteUser(w http.ResponseWriter, r *http.Request) {
 }
 
 //Note Routes
-func (app *application) getNote(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.URL.Query().Get(":id"))
-	if err != nil || id < 1 {
+func (app *application) createNote(w http.ResponseWriter, r *http.Request) {
+	note, err := app.decodeNoteForm(r)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	uuid := app.session.GetString(r, "authenticatedUserID")
+	fmt.Println(uuid)
+	fmt.Println(note)
+	err = app.notes.Insert(uuid, note.Content)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+}
+
+func (app *application) getNoteByCategory(w http.ResponseWriter, r *http.Request) {
+	uuid := app.session.GetString(r, "authenticatedUserID")
+	category := r.URL.Query().Get(":name")
+	if category == "" {
 		app.notFound(w)
 		return
 	}
-	fmt.Fprint(w, id)
+	fmt.Println(category)
+	n, err := app.notes.GetByCategory(uuid, category)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(n)
+	// var notes []string
+	// for _, note := range *n {
+	// 	b, err := json.Marshal(note)
+	// 	if err != nil {
+	// 		app.serverError(w, err)
+	// 	}
+	// 	notes = append(notes, string(b))
+	// }
+	b, err := json.Marshal(n)
+	if err != nil {
+		app.serverError(w, err)
+	}
+	fmt.Println(string(b))
+	fmt.Fprint(w, string(b))
 }

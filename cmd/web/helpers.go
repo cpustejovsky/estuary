@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"net/http"
 	"runtime/debug"
+	"time"
 
 	"github.com/cpustejovsky/estuary/pkg/models"
+	"github.com/google/uuid"
 )
 
 func (app *application) serverError(w http.ResponseWriter, err error) {
@@ -65,4 +67,26 @@ func (app *application) decodeUserForm(r *http.Request) (FormUser, error) {
 		return user, err
 	}
 	return user, nil
+}
+
+type FormNote struct {
+	Content       string
+	Category      string
+	Tags          []string
+	DueDate       time.Time
+	RemindDate    time.Time
+	Completed     bool
+	CompletedDate time.Time
+	AccountID     uuid.UUID
+}
+
+func (app *application) decodeNoteForm(r *http.Request) (FormNote, error) {
+	decoder := json.NewDecoder(r.Body)
+
+	var note FormNote
+	err := decoder.Decode(&note)
+	if err != nil {
+		return note, err
+	}
+	return note, nil
 }

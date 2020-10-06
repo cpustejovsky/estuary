@@ -10,11 +10,11 @@ import (
 	"github.com/cpustejovsky/estuary/pkg/models"
 )
 
-type NotesModel struct {
+type NoteModel struct {
 	DB *sql.DB
 }
 
-func (m *NotesModel) Insert(content, accountId string) error {
+func (m *NoteModel) Insert(accountId, content string) error {
 	uuid, err := uuid.Parse(accountId)
 	if err != nil {
 		return err
@@ -31,21 +31,25 @@ func (m *NotesModel) Insert(content, accountId string) error {
 	return nil
 }
 
-func (m *NotesModel) GetByCategory(accountId, category string) (*[]models.Note, error) {
+func (m *NoteModel) GetByCategory(accountId, category string) (*[]models.Note, error) {
 	var notes []models.Note
 	uuid, err := uuid.Parse(accountId)
 	if err != nil {
 		return nil, err
 	}
 	stmt := `
-	SELECT content, category, tags, created, due_date
+	SELECT note_id, content, category, created
 	FROM notes 
 	WHERE account_id = $1 AND category = $2`
 	rows, err := m.DB.Query(stmt, uuid, category)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
 	defer rows.Close()
 	for rows.Next() {
 		n := &models.Note{}
-		err = rows.Scan(&n.Content, &n.Category, &n.Tags, &n.Created, &n.DueDate)
+		err = rows.Scan(&n.ID, &n.Content, &n.Category, &n.Created)
 		notes = append(notes, *n)
 	}
 	if err != nil {
