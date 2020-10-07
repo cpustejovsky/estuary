@@ -175,13 +175,7 @@ func (app *application) createNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	uuid := app.session.GetString(r, "authenticatedUserID")
-	noteId, err := app.notes.Insert(uuid, noteForm.Content)
-	if err != nil {
-		fmt.Println(err)
-		app.serverError(w, err)
-		return
-	}
-	note, err := app.notes.Get(noteId)
+	note, err := app.notes.Insert(uuid, noteForm.Content)
 	if err != nil {
 		fmt.Println(err)
 		app.serverError(w, err)
