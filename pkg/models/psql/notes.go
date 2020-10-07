@@ -108,3 +108,18 @@ func (m *NoteModel) Update(accountId, noteId, content string) (*models.Note, err
 	return n, nil
 
 }
+
+func (m *NoteModel) Delete(noteId string) error {
+	sqlStatement := `
+	DELETE FROM notes
+	WHERE note_id = $1;`
+	_, err := m.DB.Exec(sqlStatement, noteId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.ErrNoRecord
+		} else {
+			return err
+		}
+	}
+	return nil
+}

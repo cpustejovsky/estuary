@@ -51,7 +51,7 @@ type application struct {
 		Authenticate(string, string) (string, error)
 		CheckForEmail(string) (bool, error)
 		Delete(string) error
-	Get(string) (*models.Account, error)
+		Get(string) (*models.Account, error)
 		Insert(string, string, string, string) error
 		Update(string, string, string, bool, bool) (*models.Account, error)
 		UpdatePassword(string, string) error
@@ -60,6 +60,7 @@ type application struct {
 		Insert(string, string) (*models.Note, error)
 		GetByCategory(string, string) (*[]models.Note, error)
 		Update(string, string, string) (*models.Note, error)
+		Delete(string) error
 	}
 }
 

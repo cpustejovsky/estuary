@@ -229,3 +229,13 @@ func (app *application) updateNote(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Fprint(w, string(b))
 }
+
+func (app *application) deleteNote(w http.ResponseWriter, r *http.Request) {
+	noteId := r.URL.Query().Get(":id")
+	err := app.notes.Delete(noteId)
+	if err != nil {
+		fmt.Println(err)
+		app.serverError(w, err)
+		return
+	}
+}

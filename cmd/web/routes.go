@@ -37,7 +37,7 @@ func (app *application) routes() http.Handler {
 	mux.Patch("/api/notes/:id", dynamicMiddleware.Append(app.requireAuthentication).ThenFunc(app.updateNote))
 	mux.Patch("/api/notes/project", dynamicMiddleware.Append(app.requireAuthentication).ThenFunc(app.placeholder))
 	mux.Patch("/api/notes/:category", dynamicMiddleware.Append(app.requireAuthentication).ThenFunc(app.placeholder))
-	mux.Del("/api/notes/:id", dynamicMiddleware.Append(app.requireAuthentication).ThenFunc(app.placeholder))
+	mux.Del("/api/notes/:id", dynamicMiddleware.Append(app.requireAuthentication).ThenFunc(app.deleteNote))
 
 	//Project Routes
 	mux.Get("/api/projects/", dynamicMiddleware.Append(app.requireAuthentication).ThenFunc(app.placeholder))
