@@ -207,3 +207,25 @@ func (app *application) getNoteByCategory(w http.ResponseWriter, r *http.Request
 	}
 	fmt.Fprint(w, string(b))
 }
+
+func (app *application) updateNote(w http.ResponseWriter, r *http.Request) {
+	uuid := app.session.GetString(r, "authenticatedUserID")
+	noteId := r.URL.Query().Get(":id")
+	form, err := app.decodeNoteForm(r)
+	if err != nil {
+		fmt.Println(err)
+		app.serverError(w, err)
+		return
+	}
+	note, err := app.notes.Update(uuid, noteId, form.Content)
+	if err != nil {
+		fmt.Println(err)
+		app.serverError(w, err)
+		return
+	}
+	b, err := json.Marshal(note)
+	if err != nil {
+		app.serverError(w, err)
+	}
+	fmt.Fprint(w, string(b))
+}

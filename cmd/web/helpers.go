@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/cpustejovsky/estuary/pkg/models"
-	"github.com/google/uuid"
 )
 
 func (app *application) serverError(w http.ResponseWriter, err error) {
@@ -77,7 +76,7 @@ type FormNote struct {
 	RemindDate    time.Time
 	Completed     bool
 	CompletedDate time.Time
-	AccountID     uuid.UUID
+	AccountID     string
 }
 
 func (app *application) decodeNoteForm(r *http.Request) (FormNote, error) {

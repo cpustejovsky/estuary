@@ -51,7 +51,7 @@ type application struct {
 		Authenticate(string, string) (string, error)
 		CheckForEmail(string) (bool, error)
 		Delete(string) error
-		Get(string) (*models.Account, error)
+	Get(string) (*models.Account, error)
 		Insert(string, string, string, string) error
 		Update(string, string, string, bool, bool) (*models.Account, error)
 		UpdatePassword(string, string) error
@@ -59,6 +59,7 @@ type application struct {
 	notes interface {
 		Insert(string, string) (*models.Note, error)
 		GetByCategory(string, string) (*[]models.Note, error)
+		Update(string, string, string) (*models.Note, error)
 	}
 }
 
@@ -66,11 +67,6 @@ func init() {
 	if err := godotenv.Load(); err != nil {
 		log.Print("No .env file found")
 	}
-
-	// file, err := os.OpenFile("log.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
 
 	// Logging
 	errorLog = log.New(os.Stderr, "ERROR\t", log.Ldate|log.LUTC|log.Llongfile)

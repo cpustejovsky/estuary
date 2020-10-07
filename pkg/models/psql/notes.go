@@ -75,3 +75,36 @@ func (m *NoteModel) GetByCategory(accountId, category string) (*[]models.Note, e
 
 	return &notes, nil
 }
+
+func (m *NoteModel) Update(accountId, noteId, content string) (*models.Note, error) {
+	accountUUID, err := uuid.Parse(accountId)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	noteUUID, err := uuid.Parse(noteId)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	query := `
+	UPDATE notes
+	SET content = $3
+	WHERE account_id = $1 AND note_id = $2 RETURNING note_id, content, category, created
+	`
+	stmt, err := m.DB.Prepare(query)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	defer stmt.Close()
+	n := &models.Note{}
+	err = stmt.QueryRow(accountUUID, noteUUID, content).Scan(&n.ID, &n.Content, &n.Category, &n.Created)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	return n, nil
+
+}

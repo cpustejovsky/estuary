@@ -6,7 +6,6 @@ CREATE TABLE notes (
     created timestamp without time zone default (now() at time zone 'utc'),
     due_date timestamp,
     remind_date timestamp,
-    completed BOOLEAN DEFAULT false,
     completedDate timestamp,
     account_id uuid references accounts(account_id),
     PRIMARY KEY (note_id)
