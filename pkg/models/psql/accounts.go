@@ -3,6 +3,7 @@ package psql
 import (
 	"database/sql"
 	"errors"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -115,9 +116,9 @@ func (m *UserModel) Update(id, FirstName, LastName string, EmailUpdates, Advance
 	}
 	stmt := `
 	UPDATE accounts
-	SET first_name = $2, last_name = $3, email_updates = $4, advanced_view = $5
+	SET first_name = $2, last_name = $3, email_updates = $4, advanced_view = $5, updated = $6
 	WHERE account_id = $1`
-	_, err = m.DB.Exec(stmt, uuid, FirstName, LastName, EmailUpdates, AdvancedView)
+	_, err = m.DB.Exec(stmt, uuid, FirstName, LastName, EmailUpdates, AdvancedView, time.Now())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, models.ErrNoRecord
