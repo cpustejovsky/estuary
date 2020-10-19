@@ -4,7 +4,11 @@ import (
 	"bytes"
 	"net/http"
 	"testing"
+
+	"github.com/cpustejovsky/estuary/pkg/models"
 )
+
+type Notes = []models.Note
 
 func TestNoteRoutesExist(t *testing.T) {
 	app := newTestApplication(t)
@@ -16,8 +20,7 @@ func TestNoteRoutesExist(t *testing.T) {
 		wantCode int
 		wantBody []byte
 	}{
-		{"Home", "/", "get", http.StatusOK, []byte("Hello, World")},
-		{"Getting Notes", "/api/notes/123", "get", http.StatusOK, []byte("123")},
+		{"Getting Notes", "/api/notes/category/test", "get", http.StatusOK, []byte("Hello")},
 		{"Posting to Notes", "/api/notes", "post", http.StatusOK, nil},
 	}
 
