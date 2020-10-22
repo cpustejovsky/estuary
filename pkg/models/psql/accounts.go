@@ -3,6 +3,7 @@ package psql
 import (
 	"database/sql"
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -30,7 +31,7 @@ func (m *UserModel) Insert(first_name, last_name, email, password string) error 
 	if err != nil {
 		var postgresError *pq.Error
 		if errors.As(err, &postgresError) {
-			if postgresError.Code == "23505" {
+			if strings.EqualFold(string(postgresError.Code), "23505") {
 				return models.ErrDuplicateEmail
 			}
 		}
