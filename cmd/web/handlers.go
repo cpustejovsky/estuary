@@ -4,12 +4,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/google/uuid"
+	"github.com/mailgun/mailgun-go/v4"
 
 	"github.com/cpustejovsky/estuary/pkg/mailer"
 	"github.com/cpustejovsky/estuary/pkg/models"
+	t "github.com/cpustejovsky/twitter_bot"
 	"github.com/gorilla/csrf"
 )
 
@@ -237,5 +241,33 @@ func (app *application) deleteNote(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 		app.serverError(w, err)
 		return
+	}
+}
+
+func (app *application) runTwitterBot(w http.ResponseWriter, r *http.Request) {
+	n := []string{"FluffyHookers", "elpidophoros"}
+	c := make(chan t.User)
+	creds := t.TwitterCredentials{
+		AccessToken:       os.Getenv("TWITTER_ACCESS_TOKEN"),
+		AccessTokenSecret: os.Getenv("TWITTER_ACCESS_TOKEN_SECRET"),
+		ConsumerKey:       os.Getenv("TWITTER_CONSUMER_KEY"),
+		ConsumerSecret:    os.Getenv("TWITTER_CONSUMER_SECRET"),
+	}
+	tb, err := t.NewBot(creds)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, name := range n {
+		go tb.FindUserTweets(name, c, 5)
+		tb.AddUsers(c)
+	}
+	mg, err := mailgun.NewMailgunFromEnv()
+	if err != nil {
+		errorLog.Println(err)
+	}
+	if err := tb.SendEmail(mg, "charles.pustejovsky@gmail.com"); err != nil {
+		fmt.Fprintf(w, "No email was sent.\n%v", err)
+	} else {
+		fmt.Fprintf(w, "Email is being sent")
 	}
 }

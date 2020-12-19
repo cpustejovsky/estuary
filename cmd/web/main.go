@@ -83,7 +83,7 @@ func main() {
 	// Environemntal Variables
 	var password = os.Getenv("TEST_PSQL_PW")
 	var sessionSecret = []byte(os.Getenv("SESSION_SECRET"))
-
+	fmt.Println("password: ", password)
 	// DB Setup
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",

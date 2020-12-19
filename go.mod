@@ -4,6 +4,8 @@ go 1.13
 
 require (
 	github.com/bmizerany/pat v0.0.0-20170815010413-6226ea591a40
+	github.com/cpustejovsky/twitter_bot v0.0.0-20201015183506-b92f0e5723d5
+	github.com/dghubble/go-twitter v0.0.0-20201011215211-4b180d0cc78d // indirect
 	github.com/golangcollege/sessions v1.2.0
 	github.com/google/uuid v1.1.2
 	github.com/gorilla/csrf v1.7.0
