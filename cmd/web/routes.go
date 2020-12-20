@@ -13,7 +13,7 @@ func (app *application) routes() http.Handler {
 
 	mux := pat.New()
 
-	mux.Get("/api/test-twitter-bot", dynamicMiddleware.ThenFunc(app.runTwitterBot))
+	mux.Get("/api/test-twitter-bot", dynamicMiddleware.Append(app.requireAuthentication).ThenFunc(app.runTwitterBot))
 
 	//Auth Routes
 	mux.Get("/api/token", dynamicMiddleware.ThenFunc(app.getCSRFToken))

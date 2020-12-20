@@ -4,12 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
 	"github.com/google/uuid"
-	"github.com/mailgun/mailgun-go/v4"
 
 	"github.com/cpustejovsky/estuary/pkg/mailer"
 	"github.com/cpustejovsky/estuary/pkg/models"
@@ -244,28 +242,39 @@ func (app *application) deleteNote(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (app *application) runTwitterBot(w http.ResponseWriter, r *http.Request) {
-	n := []string{"FluffyHookers", "elpidophoros"}
-	c := make(chan t.User)
+func (app *application) EmailTwitterUpdates(w http.ResponseWriter, r *http.Request) {
+	u, err := app.users.Get(app.session.GetString(r, "authenticatedUserID"))
+	if errors.Is(err, models.ErrNoRecord) || !u.Active {
+		app.session.Remove(r, "authenticatedUserID")
+		return
+	} else if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
 	creds := t.TwitterCredentials{
 		AccessToken:       os.Getenv("TWITTER_ACCESS_TOKEN"),
 		AccessTokenSecret: os.Getenv("TWITTER_ACCESS_TOKEN_SECRET"),
 		ConsumerKey:       os.Getenv("TWITTER_CONSUMER_KEY"),
 		ConsumerSecret:    os.Getenv("TWITTER_CONSUMER_SECRET"),
 	}
-	tb, err := t.NewBot(creds)
-	if err != nil {
-		log.Fatal(err)
+	if err := t.EmailUnreadTweets(creds, app.mgInstance, n, 5, u.EmailAddress); err != nil {
+		fmt.Fprintf(w, "No email was sent.\n%v", err)
+	} else {
+		fmt.Fprintf(w, "Email is being sent")
 	}
-	for _, name := range n {
-		go tb.FindUserTweets(name, c, 5)
-		tb.AddUsers(c)
+
+}
+
+func (app *application) runTwitterBot(w http.ResponseWriter, r *http.Request) {
+	n := []string{"FluffyHookers", "elpidophoros"}
+	creds := t.TwitterCredentials{
+		AccessToken:       os.Getenv("TWITTER_ACCESS_TOKEN"),
+		AccessTokenSecret: os.Getenv("TWITTER_ACCESS_TOKEN_SECRET"),
+		ConsumerKey:       os.Getenv("TWITTER_CONSUMER_KEY"),
+		ConsumerSecret:    os.Getenv("TWITTER_CONSUMER_SECRET"),
 	}
-	mg, err := mailgun.NewMailgunFromEnv()
-	if err != nil {
-		errorLog.Println(err)
-	}
-	if err := tb.SendEmail(mg, "charles.pustejovsky@gmail.com"); err != nil {
+	if err := t.EmailUnreadTweets(creds, app.mgInstance, n, 5, "charles.pustejovsky@gmail.com"); err != nil {
 		fmt.Fprintf(w, "No email was sent.\n%v", err)
 	} else {
 		fmt.Fprintf(w, "Email is being sent")
