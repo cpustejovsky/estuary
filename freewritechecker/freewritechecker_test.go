@@ -17,7 +17,7 @@ func TestFreeWriteChecker(t *testing.T) {
 		t.Error(err)
 	}
 	text := string(file)
-	
+
 	t.Run("Returns Correct Word Count", func(t *testing.T) {
 		got := WordCount(text)
 		want := 48

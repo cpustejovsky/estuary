@@ -44,6 +44,6 @@ type Note struct {
 	Completed     bool
 	CompletedDate time.Time
 	//Connect to Account
-	AccountID			uuid.UUID 
+	AccountID uuid.UUID
 	//Connect to Dependents
 }
