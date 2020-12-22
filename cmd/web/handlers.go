@@ -260,7 +260,12 @@ func (app *application) EmailTwitterUpdates(w http.ResponseWriter, r *http.Reque
 		ConsumerKey:       os.Getenv("TWITTER_CONSUMER_KEY"),
 		ConsumerSecret:    os.Getenv("TWITTER_CONSUMER_SECRET"),
 	}
-	if err := bot.EmailUnreadTweets(creds, app.mgInstance, n, 5, u.EmailAddress); err != nil {
+	tc, err := bot.NewClient(creds)
+	if err != nil {
+		errorLog.Println(err)
+		w.Write([]byte("Failed to create Twitter Client"))
+	}
+	if err := bot.EmailUnreadTweets(tc, app.mgInstance, n, 5, u.EmailAddress); err != nil {
 		fmt.Fprintf(w, "No email was sent.\n%v", err)
 	} else {
 		fmt.Fprintf(w, "Email is being sent")
@@ -276,7 +281,13 @@ func (app *application) runTwitterBot(w http.ResponseWriter, r *http.Request) {
 		ConsumerKey:       os.Getenv("TWITTER_CONSUMER_KEY"),
 		ConsumerSecret:    os.Getenv("TWITTER_CONSUMER_SECRET"),
 	}
-	if err := bot.EmailUnreadTweets(creds, app.mgInstance, n, 5, "charles.pustejovsky@gmail.com"); err != nil {
+
+	tc, err := bot.NewClient(creds)
+	if err != nil {
+		errorLog.Println(err)
+		w.Write([]byte("Failed to create Twitter Client"))
+	}
+	if err = bot.EmailUnreadTweets(tc, app.mgInstance, n, 5, "charles.pustejovsky@gmail.com"); err != nil {
 		fmt.Fprintf(w, "No email was sent.\n%v", err)
 	} else {
 		fmt.Fprintf(w, "Email is being sent")
