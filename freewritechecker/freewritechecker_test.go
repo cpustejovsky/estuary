@@ -1,9 +1,11 @@
-package freewritechecker
+package freewritechecker_test
 
 import (
 	"io/ioutil"
 	"reflect"
 	"testing"
+
+	"github.com/cpustejovsky/estuary/freewritechecker"
 )
 
 func TestFreeWriteChecker(t *testing.T) {
@@ -19,7 +21,7 @@ func TestFreeWriteChecker(t *testing.T) {
 	text := string(file)
 
 	t.Run("Returns Correct Word Count", func(t *testing.T) {
-		got := WordCount(text)
+		got := freewritechecker.WordCount(text)
 		want := 48
 		if got != want {
 			t.Errorf("want %d; got %d", want, got)
@@ -27,7 +29,7 @@ func TestFreeWriteChecker(t *testing.T) {
 	})
 
 	t.Run("Returns string of text with notes removed", func(t *testing.T) {
-		got, _ := NoteChecker(text)
+		got, _ := freewritechecker.NoteChecker(text)
 		want := string(notesRemoved)
 		if got != want {
 			t.Errorf("\nwant:\n%v\ngot:\n%v", want, got)
@@ -35,7 +37,7 @@ func TestFreeWriteChecker(t *testing.T) {
 	})
 
 	t.Run("Returns an array of notes", func(t *testing.T) {
-		_, got := NoteChecker(text)
+		_, got := freewritechecker.NoteChecker(text)
 		want := []string{"this is a note", "this is a note"}
 		if !reflect.DeepEqual(got, want) {
 			t.Errorf("\nwant:\n%v\ngot:\n%v", want, got)
