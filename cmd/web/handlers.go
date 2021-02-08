@@ -20,6 +20,10 @@ func (app *application) placeholder(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Hello, World")
 }
 
+func ping(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("OK"))
+}
+
 //Auth Routes
 func (app *application) getCSRFToken(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("X-CSRF-Token", csrf.Token(r))
